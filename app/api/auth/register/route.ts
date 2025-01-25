@@ -25,6 +25,13 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role: "ADMIN",
+        site: {
+          create: {
+            name: "Yeni Site",
+            description: "Site açıklaması",
+            url: "http://localhost:3000",
+          },
+        },
       },
       select: {
         id: true,

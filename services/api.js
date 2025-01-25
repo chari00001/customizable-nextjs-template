@@ -7,23 +7,38 @@ const api = axios.create({
   },
 });
 
-// Request interceptor - Token ekleme
+// Request interceptor - Token ekleme ve loglama
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  console.log("🚀 API İsteği:", {
+    url: config.url,
+    method: config.method,
+    data: config.data,
+    params: config.params,
+  });
+
   return config;
 });
 
-// Response interceptor - Hata yönetimi
+// Response interceptor - Hata yönetimi ve loglama
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    console.log("✅ API Yanıtı:", {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
   (error) => {
+    console.error("❌ API Hatası:", {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+
     if (error.response?.status === 401) {
-      // Token geçersiz veya süresi dolmuş
-      localStorage.removeItem("token");
-      localStorage.removeItem("isLoggedIn");
       window.location.href = "/admin/login";
     }
     return Promise.reject(error);
